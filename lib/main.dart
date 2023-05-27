@@ -62,6 +62,7 @@ Future singleUnlock() async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await windowManager.ensureInitialized();
 
   if( MyConfig.fullScreen ){
     await SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
@@ -100,7 +101,6 @@ void main() async {
   setWindowVisibility(visible: true);
 
   // 常に手前に表示
-  await windowManager.ensureInitialized();
   bool alwaysOnTop = prefs.getBool( "alwaysOnTop" ) ?? false;
   windowManager.setAlwaysOnTop(alwaysOnTop);
 
