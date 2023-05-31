@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:devicelocale/devicelocale.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:system_tray/system_tray.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:window_size/window_size.dart';
 
@@ -19,6 +21,8 @@ late File singleLockFile;
 late File requestFocusFile;
 
 late HotKey _globalHotKey;
+
+String currentLocale = '';
 
 Future<bool> requestFocus() async {
   try {
@@ -119,6 +123,11 @@ void main() async {
     },
   );
 
+  // ロケールを取得
+  if( Platform.isMacOS ) {
+    currentLocale = await Devicelocale.currentLocale ?? '';
+  }
+
   runApp( MyApp() );
 }
 
@@ -139,7 +148,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build( BuildContext context ){
-    return MaterialApp(
+    Widget materialApp = MaterialApp(
         localizationsDelegates: localizationsDelegates, // ローカライゼーション
         supportedLocales: supportedLocales, // ローカライゼーション
         theme: ThemeData(
@@ -152,6 +161,35 @@ class MyApp extends StatelessWidget {
         ),
         routes: MyConfig.routes // ページ一覧
     );
+    if( Platform.isMacOS ){
+      return PlatformMenuBar(
+          menus: [
+            PlatformMenu(
+              label: '',
+              menus: [
+                PlatformMenuItemGroup(
+                  members: [
+                    const PlatformProvidedMenuItem(type: PlatformProvidedMenuItemType.about),
+                  ],
+                ),
+                PlatformMenuItemGroup(
+                  members: [
+                    PlatformMenuItem(
+                      label: currentLocale.toLowerCase().contains('jp') ? '終了' : 'Quit',
+                      shortcut: const SingleActivator(LogicalKeyboardKey.keyQ, meta: true),
+                      onSelected: () {
+                        AppWindow().close();
+                      }
+                    ),
+                  ]
+                ),
+              ],
+            ),
+          ],
+          child: materialApp
+      );
+    }
+    return materialApp;
   }
 }
 

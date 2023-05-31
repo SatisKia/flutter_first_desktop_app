@@ -5,6 +5,7 @@
 import FlutterMacOS
 import Foundation
 
+import devicelocale
 import hotkey_manager
 import path_provider_foundation
 import screen_retriever
@@ -14,6 +15,7 @@ import window_manager
 import window_size
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
+  DevicelocalePlugin.register(with: registry.registrar(forPlugin: "DevicelocalePlugin"))
   HotkeyManagerPlugin.register(with: registry.registrar(forPlugin: "HotkeyManagerPlugin"))
   PathProviderPlugin.register(with: registry.registrar(forPlugin: "PathProviderPlugin"))
   ScreenRetrieverPlugin.register(with: registry.registrar(forPlugin: "ScreenRetrieverPlugin"))
